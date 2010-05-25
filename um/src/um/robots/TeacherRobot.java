@@ -33,6 +33,57 @@ public class TeacherRobot extends Agent {
 	RobotAttribute rot = new RobotAttribute(0, 0, 70);
 	
 	RobotAttribute speed = new RobotAttribute(100, 1, 200);
+	
+	enum Dir { FF, FL, FR };
+	
+	void addSonarBeltSensor()
+	  {
+		int nbsensors = 6;
+		
+		Vector3d [] positions = new Vector3d[nbsensors];
+		Vector3d [] directions = new Vector3d[nbsensors];
+		
+		double h = this.getHeight();
+        
+		double angle = Math.PI/6;
+		
+        setSensorPositionAndDirection(positions, directions, 0, 0, true);
+        setSensorPositionAndDirection(positions, directions, 0, 1, false);
+        
+        setSensorPositionAndDirection(positions, directions, angle, 2, true);
+        setSensorPositionAndDirection(positions, directions, angle, 3, false);
+
+        setSensorPositionAndDirection(positions, directions, -angle, 4, true);
+        setSensorPositionAndDirection(positions, directions, -angle, 5, false);
+        
+		sonars = new RangeSensorBelt(positions, directions, RangeSensorBelt.TYPE_SONAR, RangeSensorBelt.FLAG_SHOW_FULL_SENSOR_RAY);
+		sonars.setUpdateOnEachFrame(true);    
+	    
+	    Vector3d pos = new Vector3d(0.0D, h*1.1, 0.0D);
+	    this.addSensorDevice(sonars, pos, 0.0D);
+	    return;
+	  }
+	
+	void setSensorPositionAndDirection(Vector3d [] pos, Vector3d [] dir, double rotation, int arrayInd, boolean isLeft) {
+	    double r = this.getRadius();
+	    Transform3D tr = new Transform3D();
+	    Vector3d thePos = new Vector3d(0, 0, 0);
+        Vector3d frontDir = new Vector3d(1, 0, 0);
+        
+        if (isLeft) thePos.z = -r;
+        else thePos.z = r;
+        
+            tr.setIdentity();
+            tr.rotY(rotation);
+            Vector3d p = new Vector3d(thePos);
+            tr.transform(p);
+            pos[arrayInd] = p;
+            Vector3d d = new Vector3d(frontDir);
+            tr = new Transform3D();
+            tr.rotY(rotation);
+            tr.transform(d);
+            dir[arrayInd] = d;
+	}
 
 
 	public TeacherRobot(Vector3d pos, String name, float scale) {
@@ -44,8 +95,7 @@ public class TeacherRobot extends Agent {
 		radius = 2f*scale;
 		mass = 1000f*scale;
 		
-		sonars = RobotFactory.addSonarBeltSensor(this, 18);
-		sonars.setUpdateOnEachFrame(true);
+		addSonarBeltSensor();
 		
 		 // display format for numbers
         format = new DecimalFormat();
@@ -68,105 +118,47 @@ public class TeacherRobot extends Agent {
 		return min/scale;
 	}
 	
-	SensorReading getMaxFrontDistAngle() {
-		double max = Double.MIN_VALUE;
-		double angle = 0;
-		int mi=-1;
-		for (int i=0; i<sonars.getNumSensors(); i++) {
-			double sa = sonars.getSensorAngle(i);
-			if (sa >= Math.PI*3/2 || sa <= Math.PI/2) {
-				if (sonars.getMeasurement(i) > max){
-					max = sonars.getMeasurement(i);
-					angle = sonars.getSensorAngle(i);
-					mi = i;
-				}
-			}
+	Dir getBestDirection() {
+		Dir ret = Dir.FF;
+		double maxDist;
+		
+		maxDist = Math.min(sonars.getMeasurement(0), sonars.getMeasurement(1));
+		
+		if (Math.min(sonars.getMeasurement(2), sonars.getMeasurement(3)) > maxDist) {
+			maxDist = Math.min(sonars.getMeasurement(2), sonars.getMeasurement(3));
+			ret = Dir.FL;
 		}
-		int hi = mi+1;
-		int li = mi-1;
-		if (li < 0) li = sonars.getNumSensors()-1;
-		if (hi>=sonars.getNumSensors()) hi=0;
-		return new SensorReading(angle, max, sonars.getSensorAngle(li), sonars.getSensorAngle(hi));
-	}
-	
-	SensorReading getMinFrontDistAngle() {
-		double min = Double.MAX_VALUE;
-		double angle = 0;
-		int mi=-1;
-		for (int i=0; i<sonars.getNumSensors(); i++) {
-			double sa = sonars.getSensorAngle(i);
-			if (sa >= Math.PI*3/2 || sa <= Math.PI/2) {
-				if (sonars.getMeasurement(i) < min){
-					min = sonars.getMeasurement(i);
-					angle = sonars.getSensorAngle(i);
-					mi = i;
-				}
-				
-			}
+		
+		if (Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5)) > maxDist) {
+			maxDist = Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5));
+			ret = Dir.FL;
 		}
-		int hi = mi+1;
-		int li = mi-1;
-		if (li < 0) li = sonars.getNumSensors()-1;
-		if (hi>=sonars.getNumSensors()) hi=0;
-		return new SensorReading(angle, min, sonars.getSensorAngle(li), sonars.getSensorAngle(hi));
+		
+		return ret;
 	}
 	
-	double getMinLeft() {
-		return getMinDist(Math.PI/4, Math.PI*3/4);
-	}
-	
-	double getMinRight() {
-		return getMinDist(Math.PI*5/4, Math.PI*7/4);
-	}
-	
-	double getMinFront() {
-		return Math.min(getMinDist(0, Math.PI/4), getMinDist(Math.PI*7/4, Math.PI*2));
-	}
 	
 	
 	@Override
 	protected void performBehavior() {
 		super.performBehavior();
-		omniMinDist.val = getMinDist(0, 2*Math.PI);
-		SensorReading max = getMaxFrontDistAngle();
 		
-		if ( ! omniMinDist.isOk()) {
-			speed.setValuePercent(omniMinDist.getMeasureRating()*0.5);
-			SensorReading min = getMinFrontDistAngle();
-			double newang;
-			if (min.ang < max.ang) newang = max.higherAngle;
-			else newang = max.lowerAngle;
-
-			Dbg.prn("min="+Math.toDegrees(min.ang)+" max="+Math.toDegrees(max.ang)+" newang="+Math.toDegrees(newang));
-			
-			if (newang > 0) {
-				Dbg.prn("close, going left.");
-				rot.setValuePercent(1);
-			}
-			else if (newang < 0) {
-				Dbg.prn("close, going right.");
-				rot.setValuePercent(-1);
-			}
-			else {
-				Dbg.prn("close, going ok");
-				rot.setValuePercent(0);
-			}
-			
+		Dir dir = getBestDirection();
+		
+		Dbg.prn("direction: "+dir);
+		
+		switch (dir) {
+		case FF:
+			rot.setValuePercent(0);
+			break;
+		case FL:
+			rot.setValuePercent(-1);
+			break;
+		case FR:
+			rot.setValuePercent(1);
+			break;
 		}
-		else {
-			speed.setValuePercent(1);
-			if (max.ang > 0) {
-				Dbg.prn("going left.");
-				rot.setValuePercent(1);
-			}
-			else if (max.ang < 0) {
-				Dbg.prn("going right.");
-				rot.setValuePercent(-1);
-			}
-			else {
-				rot.setValuePercent(0);
-			}
-		}
+		
 		setTranslationalVelocity(speed.val*scale/3.6);
 		setRotationalVelocity(Math.toRadians(rot.val));
 	}
@@ -191,10 +183,7 @@ public class TeacherRobot extends Agent {
 	      "z             \t= " + format.format(t.z / scale) + " m\n"+
 	      "odometer      \t= " + format.format(odometer  / scale) + " m\n" +
 	      "speed      \t= " + format.format(3.6*speed / scale) + " km/h\n"+
-	      "rotation   \t= " + format.format(Math.toDegrees(rot)) + " deg/s\n"+
-	      "leftDist: \t= "+format.format(getMinLeft()) + "m\n"+
-	      "rightDist: \t= "+format.format(getMinRight()) + "m\n"+
-	      "frontDist: \t= "+format.format(getMinFront())+ "m\n";
+	      "rotation   \t= " + format.format(Math.toDegrees(rot)) + " deg/s\n";
 	}
 
 }
