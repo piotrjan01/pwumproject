@@ -30,9 +30,9 @@ public class ReferenceRobot extends Agent {
 	
 	RangeSensorBelt sonars;
 	
-	RobotAttribute rot = new RobotAttribute(0, 0, 70);
+	RobotOutput rot = new RobotOutput(0, 0, 70);
 	
-	RobotAttribute speed = new RobotAttribute(100, 1, 200);
+	RobotOutput speed = new RobotOutput(100, 1, 200);
 
 
 	public ReferenceRobot(Vector3d pos, String name, float scale) {

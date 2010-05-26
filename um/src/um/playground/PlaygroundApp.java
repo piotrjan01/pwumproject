@@ -15,7 +15,7 @@ public class PlaygroundApp {
 	public static void main(String[] args) {
 		float scale = 1/50f;
 		EnvFactory.wallHeight *= scale;
-		String map = "map2.png";
+		String map = "map3.png";
 		EnvironmentDescription ed = EnvFactory.readFromImageFile(map);
 		ed.add(new TeacherRobot(EnvFactory.getRobotStartPosFromImageFile(map), "Ref. robot", scale));
 		

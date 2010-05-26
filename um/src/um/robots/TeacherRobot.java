@@ -9,7 +9,6 @@ import javax.vecmath.Vector3d;
 import simbad.sim.Agent;
 import simbad.sim.DefaultKinematic;
 import simbad.sim.RangeSensorBelt;
-import simbad.sim.RobotFactory;
 import um.common.Dbg;
 
 /**
@@ -19,26 +18,21 @@ import um.common.Dbg;
  */
 public class TeacherRobot extends Agent {
 	
-	/**
-	 * The minimal distance in any direction from the robot
-	 */
-	RobotMeasure omniMinDist = new RobotMeasure(0, 0.5, 3);
-	
 	DecimalFormat format;
 	
 	float scale;
 	
 	RangeSensorBelt sonars;
 	
-	RobotAttribute rot = new RobotAttribute(0, 0, 70);
+	RobotOutput rot = new RobotOutput(0, 0, 90);
 	
-	RobotAttribute speed = new RobotAttribute(100, 1, 200);
+	RobotOutput speed = new RobotOutput(100, 1, 200);
 	
-	enum Dir { FF, FL, FR };
+	enum Dir { FF, FL, FR, SL, SR};
 	
 	void addSonarBeltSensor()
 	  {
-		int nbsensors = 6;
+		int nbsensors = 10;
 		
 		Vector3d [] positions = new Vector3d[nbsensors];
 		Vector3d [] directions = new Vector3d[nbsensors];
@@ -55,6 +49,12 @@ public class TeacherRobot extends Agent {
 
         setSensorPositionAndDirection(positions, directions, -angle, 4, true);
         setSensorPositionAndDirection(positions, directions, -angle, 5, false);
+        
+        setSensorPositionAndDirection(positions, directions, 2*angle, 6, true);
+        setSensorPositionAndDirection(positions, directions, 2*angle, 7, false);
+        
+        setSensorPositionAndDirection(positions, directions, -2*angle, 8, true);
+        setSensorPositionAndDirection(positions, directions, -2*angle, 9, false);
         
 		sonars = new RangeSensorBelt(positions, directions, RangeSensorBelt.TYPE_SONAR, RangeSensorBelt.FLAG_SHOW_FULL_SENSOR_RAY);
 		sonars.setUpdateOnEachFrame(true);    
@@ -106,18 +106,6 @@ public class TeacherRobot extends Agent {
 		
 	}
 	
-	double getMinDist(double minAngle, double maxAngle) {
-		double min = Double.MAX_VALUE;
-		for (int i=0; i<sonars.getNumSensors(); i++) {
-			if (sonars.getSensorAngle(i) >= minAngle &&
-					sonars.getSensorAngle(i) <= maxAngle) {
-				if (sonars.getMeasurement(i) < min)
-					min = sonars.getMeasurement(i);
-			}
-		}
-		return min/scale;
-	}
-	
 	Dir getBestDirection() {
 		Dir ret = Dir.FF;
 		double maxDist;
@@ -131,7 +119,17 @@ public class TeacherRobot extends Agent {
 		
 		if (Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5)) > maxDist) {
 			maxDist = Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5));
-			ret = Dir.FL;
+			ret = Dir.FR;
+		}
+		
+		if (Math.min(sonars.getMeasurement(6), sonars.getMeasurement(7)) > maxDist) {
+			maxDist = Math.min(sonars.getMeasurement(6), sonars.getMeasurement(7));
+			ret = Dir.SL;
+		}
+		
+		if (Math.min(sonars.getMeasurement(8), sonars.getMeasurement(9)) > maxDist) {
+			maxDist = Math.min(sonars.getMeasurement(8), sonars.getMeasurement(9));
+			ret = Dir.SR;
 		}
 		
 		return ret;
@@ -147,15 +145,30 @@ public class TeacherRobot extends Agent {
 		
 		Dbg.prn("direction: "+dir);
 		
+		double sspeed = 0.1;
+		double mspeed = 0.5;
+		double medrotspeed = 1;
+		
 		switch (dir) {
 		case FF:
 			rot.setValuePercent(0);
+			speed.setValuePercent(1);
 			break;
 		case FL:
-			rot.setValuePercent(-1);
+			rot.setValuePercent(medrotspeed);
+			speed.setValuePercent(mspeed);
 			break;
 		case FR:
+			rot.setValuePercent(-medrotspeed);
+			speed.setValuePercent(mspeed);
+			break;
+		case SL:
 			rot.setValuePercent(1);
+			speed.setValuePercent(sspeed);
+			break;
+		case SR:
+			rot.setValuePercent(-1);
+			speed.setValuePercent(sspeed);
 			break;
 		}
 		

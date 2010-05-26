@@ -1,6 +1,6 @@
 package um.robots;
 
-public class RobotAttribute {
+public class RobotOutput {
 	
 	public double val;
 	
@@ -8,7 +8,7 @@ public class RobotAttribute {
 	
 	public double maxVal;
 	
-	public RobotAttribute(double initVal, double minVal, double maxVal) {
+	public RobotOutput(double initVal, double minVal, double maxVal) {
 		val = initVal;
 		this.minVal = minVal;
 		this.maxVal = maxVal;
