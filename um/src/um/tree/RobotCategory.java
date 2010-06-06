@@ -26,5 +26,12 @@ public class RobotCategory implements Category {
 	public void setRot(double rot) {
 		this.rot = rot;
 	}
+	
+	@Override
+	public boolean equals(Object arg0) {
+		RobotCategory c = (RobotCategory)arg0;
+		if (c.speed == speed && c.rot == rot) return true;
+		return false;
+	}
 
 }

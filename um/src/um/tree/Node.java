@@ -8,7 +8,7 @@ public class Node {
 		return cat;
 	}
 
-	public void setCat(Category cat) {
+	public void setCategory(Category cat) {
 		this.cat = cat;
 	}
 

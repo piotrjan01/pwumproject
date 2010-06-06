@@ -8,14 +8,14 @@ public class TreeBuilder {
 	public static Node buildTheTree(ExamplesSet es, Node tree) {
 		if (es.isMajorityOfOneCategory(stopCriteriumTolerance)) {
 			//Choosing the category for the leaf
-			tree.setCat(es.getMostFrequentCategory());
+			tree.setCategory(es.getMostFrequentCategory());
 			return tree;
 		}
-		Test t = chooseTest(es);
+		ContinousTest t = chooseTest(es);
 		return null;
 	}
 	
-	static Test chooseTest(ExamplesSet examples) {
+	static ContinousTest chooseTest(ExamplesSet examples) {
 		//TODO: implement
 		return null;
 	}
