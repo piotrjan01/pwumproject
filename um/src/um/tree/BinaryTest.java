@@ -3,7 +3,7 @@ package um.tree;
 public class BinaryTest {
 	
 
-	boolean testAttribute(Attribute a) {
+	boolean testAttribute(AttributeList a) {
 		return false;
 	}
 	

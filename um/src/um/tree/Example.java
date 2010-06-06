@@ -2,13 +2,23 @@ package um.tree;
 
 public class Example {
 	
-	Attribute attr;
+	AttributeList attr;
 	
 	Category cat;
 	
-	public Example(Attribute a, Category c) {
+	public Example(AttributeList a, Category c) {
 		this.attr = a;
 		this.cat = c;
 	}
+
+	public AttributeList getAttr() {
+		return attr;
+	}
+
+	public Category getCat() {
+		return cat;
+	}
+	
+	
 
 }

@@ -1,5 +1,7 @@
 package um.tree;
 
+import java.util.Vector;
+
 
 /**
  * The results of this test are true or false
@@ -9,7 +11,32 @@ package um.tree;
 public class ContinousTest extends BinaryTest {
 	
 	
-	static BinaryTest chooseTest(ExamplesSet examples) {
+	
+	public static ContinousTest chooseTest(ExamplesSet examples, Vector<ContinousTest> usedTests) {
+		AttributeList al = examples.examples.firstElement().attr; 
+		int attrCount = al.getNumberOfAttributes();
+		
+		ContinousTest bestTest = null;
+		double minEnthropy = Double.MAX_VALUE;
+		
+		for (int i=0; i<attrCount; i++) {
+			double [] avs = examples.getAscSortedAttributes(i);
+			for (int j=1; j<avs.length; j++) 
+				avs[j-1] += (avs[j]-avs[j-1]) / 2;
+			for (double d : avs) {
+				ContinousTest t = new ContinousTest(d, i);
+//				if (usedTests.contains(t)) continue;
+				double entr = examples.getSetEnthropyWithSpecifiedTest(t);
+				if (entr < minEnthropy) {
+					bestTest = t;
+					minEnthropy = entr;
+				}
+			}
+		}
+		return bestTest;
+	}
+	
+	static ContinousTest generateTest(int attrCount) {
 		return null;
 	}
 	
@@ -29,7 +56,7 @@ public class ContinousTest extends BinaryTest {
 	}
 
 	@Override
-	public boolean testAttribute(Attribute a) {
+	public boolean testAttribute(AttributeList a) {
 		try {
 			if (a.getAttributeValue(index) < theta) return true;
 		} catch (Exception e) {
@@ -37,6 +64,19 @@ public class ContinousTest extends BinaryTest {
 			return false;
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean equals(Object arg0) {
+		ContinousTest t = (ContinousTest)arg0;
+		if (t.index == index && t.theta == theta) return true;
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		
+		return "theta="+theta+" attrIndex="+index;
 	}
 
 }

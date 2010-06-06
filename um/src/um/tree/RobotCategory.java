@@ -34,4 +34,11 @@ public class RobotCategory implements Category {
 		return false;
 	}
 
+    @Override
+    public String toString() {
+        return " rot="+rot+" speed="+speed;
+    }
+
+
+
 }

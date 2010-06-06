@@ -1,6 +1,8 @@
 package um.tree;
 
 import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 public class ExamplesSet {
@@ -116,7 +118,9 @@ public class ExamplesSet {
 		for (Category cat : getAllCategories()) {
 			double ptrd = getExamplesCountWithSpecifiedCategoryTestAndResult(cat, test, result);
 			double ptr = getExamplesCountWithSpecifiedTestAndResult(test, result);
-			ret = ret - (ptrd/ptr)*Math.log(ptrd/ptr);
+			double x = ptrd/ptr;
+			if (x == 0) continue;
+			ret = ret - x*Math.log(x);
 		}
 		return ret;
 	}
@@ -125,12 +129,54 @@ public class ExamplesSet {
 		double countP = examples.size();
 		
 		double ptr1 = getExamplesCountWithSpecifiedTestAndResult(test, true);
-		double etr1 = getSetEnthropyWithSpecifiedTestAndResult(test, true);
+		double etr1 = getSetEnthropyWithSpecifiedTestAndResult(test, true); //NaN !!
 		
 		double ptr2 = getExamplesCountWithSpecifiedTestAndResult(test, false);
-		double etr2 = getSetEnthropyWithSpecifiedTestAndResult(test, false);
+		double etr2 = getSetEnthropyWithSpecifiedTestAndResult(test, false); //NaN !!
 		
 		return (ptr1*etr1/countP)+(ptr2*etr2/countP);
+	}
+	
+	public double getMinAttrVal(int attrIndex) {
+		double ret = Double.MAX_VALUE;
+		for (Example e : examples) {
+			if (e.attr.getAttributeValue(attrIndex) < ret)
+				ret = e.attr.getAttributeValue(attrIndex);
+		}
+		return ret;
+	}
+	
+	public double getMaxAttrVal(int attrIndex) {
+		double ret = Double.MIN_VALUE;
+		for (Example e : examples) {
+			if (e.attr.getAttributeValue(attrIndex) > ret)
+				ret = e.attr.getAttributeValue(attrIndex);
+		}
+		return ret;
+	}
+	
+	public double [] getAscSortedAttributes(int atrInd) {
+		TreeSet<Double> s = new TreeSet<Double>();
+		for (Example e : examples) {
+			s.add(e.attr.getAttributeValue(atrInd));
+		}
+		double [] ret = new double[s.size()];
+		int i=0;
+		for (Double d : s) ret[i++] = d; 
+		return ret;
+	}
+	
+	public ExamplesSet getExamplesSubsetForSpecifiedTestAndResult(ContinousTest test, boolean result) {
+		ExamplesSet ret = new ExamplesSet();
+		for (Example e : examples) {
+			if (test.testAttribute(e.attr) != result) continue;
+			ret.addExample(e);
+		}
+		return ret;
+	}
+
+	public Vector<Example> getExamples() {
+		return examples;
 	}
 	
 	
