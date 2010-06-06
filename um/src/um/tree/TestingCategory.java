@@ -20,4 +20,9 @@ public class TestingCategory implements Category {
 		return false;
 	}
 	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+	
 }

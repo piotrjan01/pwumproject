@@ -27,6 +27,15 @@ public class RobotAttribute implements AttributeList {
 			if (ral.measurements[i] != measurements[i]) return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		String r = "[ ";
+		for (double d : measurements)
+			r += d+", ";
+		r += " ]";
+		return r;
+	}
 
 	
 }

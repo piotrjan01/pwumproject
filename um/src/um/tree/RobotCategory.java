@@ -29,9 +29,16 @@ public class RobotCategory implements Category {
 	
 	@Override
 	public boolean equals(Object arg0) {
+		
 		RobotCategory c = (RobotCategory)arg0;
 		if (c.speed == speed && c.rot == rot) return true;
 		return false;
+//		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		return new Double(speed+rot+Math.PI).hashCode(); 
 	}
 
     @Override

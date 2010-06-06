@@ -37,12 +37,10 @@ public class ContinousTestTest {
 		s.addExample(new Example(new RobotAttribute(atr4), c2));
 		s.addExample(new Example(new RobotAttribute(atr5), c2));
 
-		Vector<ContinousTest> bl = new Vector<ContinousTest>();
-		ContinousTest t1 = (ContinousTest) ContinousTest.chooseTest(s, bl);
-		bl.add(t1);
-		ContinousTest t2 = (ContinousTest) ContinousTest.chooseTest(s, bl);
 		
-		assertFalse(t1.equals(t2));
+		ContinousTest t1 = (ContinousTest) ContinousTest.chooseTest(s);
+		
+		
 	
 	}
 	

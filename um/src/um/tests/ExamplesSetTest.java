@@ -78,7 +78,15 @@ public class ExamplesSetTest {
 		assertTrue( ! s.isMajorityOfOneCategory(1));
 		assertTrue( ! s.isMajorityOfOneCategory(0));
 		
-		for (int i=0; i<70; i++) 
+		s.addExample(new Example(
+				new RobotAttribute(getRandDoubleTable(10)),
+				new RobotCategory(r.nextDouble(), r.nextDouble())
+		));
+		
+		assertTrue( s.isMajorityOfOneCategory(1));
+		assertTrue( s.isMajorityOfOneCategory(0));
+		
+		for (int i=1; i<70; i++) 
 			s.addExample(new Example(
 						new RobotAttribute(getRandDoubleTable(10)),
 						new RobotCategory(r.nextDouble(), r.nextDouble())
@@ -94,6 +102,17 @@ public class ExamplesSetTest {
 		assertTrue( ! s.isMajorityOfOneCategory(0.2));
 		assertTrue( ! s.isMajorityOfOneCategory(0.69));
 		assertTrue( s.isMajorityOfOneCategory(0.71));
+		
+		s = new ExamplesSet();
+		cat = new RobotCategory(r.nextDouble(), r.nextDouble());
+		for (int i=0; i<30; i++) 
+			s.addExample(new Example(
+						new RobotAttribute(getRandDoubleTable(10)),
+						cat
+			));
+		
+		assertTrue( s.isMajorityOfOneCategory(0.1));
+		assertTrue( s.isMajorityOfOneCategory(0));
 	
 	}
 	

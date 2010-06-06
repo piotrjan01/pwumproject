@@ -29,7 +29,7 @@ public class EnvFactoryTest {
 	public void testReadFromImageFile() {
 		EnvironmentDescription ed = EnvFactory.readFromImageFile("map.png");
 		ed.add(new MiniRobot(new Vector3d(0, 0, 0), "Testing robot", 1));
-		new Simbad(ed, false);
+		new Simbad(ed, true);
 //		fail("Not yet implemented");
 		
 	}

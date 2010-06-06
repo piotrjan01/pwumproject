@@ -12,7 +12,7 @@ public class ContinousTest extends BinaryTest {
 	
 	
 	
-	public static ContinousTest chooseTest(ExamplesSet examples, Vector<ContinousTest> usedTests) {
+	public static ContinousTest chooseTest(ExamplesSet examples) {
 		AttributeList al = examples.examples.firstElement().attr; 
 		int attrCount = al.getNumberOfAttributes();
 		
@@ -25,7 +25,6 @@ public class ContinousTest extends BinaryTest {
 				avs[j-1] += (avs[j]-avs[j-1]) / 2;
 			for (double d : avs) {
 				ContinousTest t = new ContinousTest(d, i);
-//				if (usedTests.contains(t)) continue;
 				double entr = examples.getSetEnthropyWithSpecifiedTest(t);
 				if (entr < minEnthropy) {
 					bestTest = t;
@@ -33,11 +32,8 @@ public class ContinousTest extends BinaryTest {
 				}
 			}
 		}
+		assert bestTest!=null;
 		return bestTest;
-	}
-	
-	static ContinousTest generateTest(int attrCount) {
-		return null;
 	}
 	
 	/**
@@ -76,7 +72,7 @@ public class ContinousTest extends BinaryTest {
 	@Override
 	public String toString() {
 		
-		return "theta="+theta+" attrIndex="+index;
+		return "attr"+index+" < "+theta;
 	}
 
 }

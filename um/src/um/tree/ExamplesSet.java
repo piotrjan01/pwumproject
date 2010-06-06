@@ -1,7 +1,6 @@
 package um.tree;
 
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -24,6 +23,19 @@ public class ExamplesSet {
 	 * @param e example
 	 */
 	public void addExample(Example e) {
+//		Category c1 = e.cat;
+//		Integer in = categoryCount.get(c1);
+//		boolean is = categoryCount.keySet().contains(c1);
+//		String cn = c1.getClass().getName();
+//		int h1 = c1.hashCode();
+//		int h2 = 0;
+//		for (Category c : categoryCount.keySet()) {
+//			if (c.equals(c1)) {
+//				is = true;
+//				h2 = c.hashCode();
+//			}
+//		}
+//		
 		if (categoryCount.containsKey(e.cat)) {
 			Integer i = categoryCount.get(e.cat);
 			i++;
@@ -56,7 +68,7 @@ public class ExamplesSet {
 	public boolean isMajorityOfOneCategory(double tolerance) {
 		double minCount = examples.size()*(1-tolerance);
 		for (Category cat : categoryCount.keySet()) {
-			if (categoryCount.get(cat) > minCount) return true;
+			if (categoryCount.get(cat) >= minCount) return true;
 		}
 		return false;
 	}
@@ -118,6 +130,7 @@ public class ExamplesSet {
 		for (Category cat : getAllCategories()) {
 			double ptrd = getExamplesCountWithSpecifiedCategoryTestAndResult(cat, test, result);
 			double ptr = getExamplesCountWithSpecifiedTestAndResult(test, result);
+			if (ptr==0) continue;
 			double x = ptrd/ptr;
 			if (x == 0) continue;
 			ret = ret - x*Math.log(x);

@@ -21,7 +21,7 @@ import um.tree.ExamplesSet;
 import um.tree.Node;
 import um.tree.RobotAttribute;
 import um.tree.RobotCategory;
-import um.tree.TreeBuilder;
+import um.tree.TreeTools;
 
 /**
  *
@@ -115,7 +115,7 @@ public class MainFrame extends javax.swing.JFrame {
         s.addExample(new Example(new RobotAttribute(new double [] {2,7}), c2));
         s.addExample(new Example(new RobotAttribute(new double [] {3,2}), c2));
     	
-        java.awt.EventQueue.invokeLater(new Runner(TreeBuilder.buildTheTree(s, null)));
+        java.awt.EventQueue.invokeLater(new Runner(TreeTools.buildTheTree(s, null)));
     }
     
     public static void showTheTree(Node root) {
