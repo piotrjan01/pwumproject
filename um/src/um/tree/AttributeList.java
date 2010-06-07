@@ -1,6 +1,8 @@
 package um.tree;
 
-public interface AttributeList {
+import java.io.Serializable;
+
+public interface AttributeList extends Serializable {
 	
 	double getAttributeValue(int index);
 	

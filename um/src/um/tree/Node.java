@@ -1,10 +1,17 @@
 package um.tree;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class Node {
+public class Node implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	static int nodesCount = 0;
 	
 	private int id;
@@ -157,6 +164,14 @@ public class Node {
     	return;
     }
     
+    public int getNodeCount() {
+    	if (isLeafNode()) return 1;
+    	int ret = 1;
+    	if (trueChild != null) ret += trueChild.getNodeCount();
+    	if (falseChild != null) ret += falseChild.getNodeCount();
+    	return ret;
+    }
+    
     public void replaceChild(Node child, Node newChild) {
     	if (trueChild == child) trueChild = newChild;
     	else if (falseChild == child) falseChild = newChild;
@@ -196,6 +211,29 @@ public class Node {
 	public HashMap<Category, Integer> getCategoryCount() {
 		return categoryCount;
 	}
+	
+	public void saveToFile(String filename) {
+        try {
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static Node readFromFile(String fileName) {
+    	Node r = null;
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            r = (Node)ois.readObject();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return r;
+    }
 	
 	
 }

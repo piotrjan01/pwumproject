@@ -1,7 +1,5 @@
 package um.tests;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Random;
 import java.util.Vector;
 
@@ -15,12 +13,14 @@ import um.tree.RobotCategory;
 import um.tree.TestingCategory;
 import um.tree.TreeTools;
 
-public class MainFrameTest {
+public class VisualTests {
 
 	public static void main(String[] args) {
 //		testShowTheTree();
-//		trimTreeTest1();
-		trimTreeTest2();
+//		trimTreeWithGivenData();
+//		trimTreeWithRandomData();
+		readExamplesBuildAndTrimTreeSaveToFile();
+//		readATreeFromFile();
 	}
 	
 	static Random r = new Random();
@@ -48,7 +48,7 @@ public class MainFrameTest {
 		
 	}
 	
-	public static void trimTreeTest1() {
+	public static void trimTreeWithGivenData() {
 		ExamplesSet s = new ExamplesSet();
 
         Category c1 = new TestingCategory("c1");
@@ -74,16 +74,21 @@ public class MainFrameTest {
         s.addExample(new Example(new RobotAttribute(new double [] {9, 8}), c2));
         
         Node r = TreeTools.buildTheTree(s, null);
-        
-        MainFrame.showTheTree(r);
-        
+        double error = r.getClassificationError(s);
+        System.out.println("Error = "+error);
+		System.out.println("nodes = "+r.getNodeCount());
+		
         TreeTools.trimTree(r, s);
+        
+        error = r.getClassificationError(s);
+        System.out.println("Error = "+error);
+		System.out.println("nodes = "+r.getNodeCount());
         
         MainFrame.showTheTree(r);
 	}
 	
 	
-	public static void trimTreeTest2() {
+	public static void trimTreeWithRandomData() {
 		System.out.println("Starting...");
 		Vector<Example> ex = new Vector<Example>();
 		for (int i=0; i<300; i++) {
@@ -107,20 +112,50 @@ public class MainFrameTest {
 		Node tree = TreeTools.buildTheTree(es, null);
 		
 		double error = tree.getClassificationError(ts);
-		Vector<Node> ns = new Vector<Node>();
-		tree.getAllTestNodes(ns);
 		System.out.println("Error = "+error);
-		System.out.println("nodes = "+ns.size());
+		System.out.println("nodes = "+tree.getNodeCount());
 		
 		TreeTools.trimTree(tree, ts);
 		error = tree.getClassificationError(ts);
 		System.out.println("Error after= "+error);
-		ns = new Vector<Node>();
-		tree.getAllTestNodes(ns);
-		System.out.println("nodes = "+ns.size());
+		System.out.println("nodes = "+tree.getNodeCount());
 		
 		MainFrame.showTheTree(tree);
 		
+	}
+	
+	public static void readExamplesBuildAndTrimTreeSaveToFile() {
+		System.out.println("Starting...");
+		ExamplesSet allExamples = ExamplesSet.readFromFile("test-examples.dat");
+		
+		ExamplesSet es = new ExamplesSet();
+		ExamplesSet ts = new ExamplesSet();
+		
+		for (int i=0; i<allExamples.getExamples().size(); i++) {
+			if (i % 3 == 0) ts.addExample(allExamples.getExamples().elementAt(i));
+			else es.addExample(allExamples.getExamples().elementAt(i));
+		}
+		
+		Node tree = TreeTools.buildTheTree(es, null);
+		
+		double error = tree.getClassificationError(ts);
+		System.out.println("Error = "+error);
+		System.out.println("nodes = "+tree.getNodeCount());
+		
+		TreeTools.trimTree(tree, ts);
+		
+		error = tree.getClassificationError(ts);
+		System.out.println("Error = "+error);
+		System.out.println("nodes = "+tree.getNodeCount());
+		
+		MainFrame.showTheTree(tree);
+		
+		tree.saveToFile("test-tree.tre");
+	}
+	
+	public static void readATreeFromFile() {
+		Node tree = Node.readFromFile("test-tree.tre");
+		MainFrame.showTheTree(tree);
 	}
 	
 	static private double [] getRandDoubleTable(int size) {

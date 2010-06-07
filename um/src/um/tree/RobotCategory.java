@@ -2,6 +2,8 @@ package um.tree;
 
 public class RobotCategory implements Category {
 	
+	private static final long serialVersionUID = 1L;
+
 	double speed;
 	
 	double rot;

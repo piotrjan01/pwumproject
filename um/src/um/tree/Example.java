@@ -1,7 +1,11 @@
 package um.tree;
 
-public class Example {
+import java.io.Serializable;
+
+public class Example implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	AttributeList attr;
 	
 	Category cat;

@@ -2,6 +2,8 @@ package um.tree;
 
 public class TestingCategory implements Category {
 	
+	private static final long serialVersionUID = 1L;
+	
 	String name;
 	
 	public TestingCategory(String name) {

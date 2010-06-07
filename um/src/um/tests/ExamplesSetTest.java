@@ -279,8 +279,8 @@ public class ExamplesSetTest {
 		double et1 = -0.5*Math.log(0.5)-0.5*Math.log(0.5);
 		double et2 = -1d/3d*Math.log(1d/3d)-2d/3d*Math.log(2d/3d);
 		
-		double et1c = s.getSetEnthropyWithSpecifiedTestAndResult(test, true);
-		double et2c = s.getSetEnthropyWithSpecifiedTestAndResult(test, false);
+		double et1c = s.getSetEntropyWithSpecifiedTestAndResult(test, true);
+		double et2c = s.getSetEntropyWithSpecifiedTestAndResult(test, false);
 		
 		assertTrue(et1c == et1);
 		assertTrue(et2c == et2);
@@ -313,10 +313,10 @@ public class ExamplesSetTest {
 		
 		double et = 2d/5*et1+3d/5*et2;
 		
-		double et1c = s.getSetEnthropyWithSpecifiedTestAndResult(test, true);
-		double et2c = s.getSetEnthropyWithSpecifiedTestAndResult(test, false);
+		double et1c = s.getSetEntropyWithSpecifiedTestAndResult(test, true);
+		double et2c = s.getSetEntropyWithSpecifiedTestAndResult(test, false);
 		
-		double etc = s.getSetEnthropyWithSpecifiedTest(test);
+		double etc = s.getSetEntropyWithSpecifiedTest(test);
 		
 		assertTrue(et1c == et1);
 		assertTrue(et2c == et2);
@@ -325,31 +325,6 @@ public class ExamplesSetTest {
 		
 	}
 	
-	@Test
-	public void getMinMaxAttrVal() {
-		s = new ExamplesSet();
-		
-		double [] atr1 = {1,2};
-		double [] atr2 = {4,4};
-		double [] atr3 = {3,2};
-		double [] atr4 = {2,7};
-		double [] atr5 = {3,2};
-		
-		RobotCategory c1 = new RobotCategory(1, 1);
-		RobotCategory c2 = new RobotCategory(2, 2);
-		
-		s.addExample(new Example(new RobotAttribute(atr1), c1));
-		s.addExample(new Example(new RobotAttribute(atr2), c1));
-		s.addExample(new Example(new RobotAttribute(atr3), c2));
-		s.addExample(new Example(new RobotAttribute(atr4), c2));
-		s.addExample(new Example(new RobotAttribute(atr5), c2));
-		
-		assertTrue(s.getMinAttrVal(1) == 2);
-		assertTrue(s.getMinAttrVal(0) == 1);
-		
-		assertTrue(s.getMaxAttrVal(1) == 7);
-		assertTrue(s.getMaxAttrVal(0) == 4);
-	}
 	
 	@Test
 	public void getAscSortedAttributes() {

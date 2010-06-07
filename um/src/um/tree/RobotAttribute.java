@@ -2,6 +2,8 @@ package um.tree;
 
 public class RobotAttribute implements AttributeList {
 
+	private static final long serialVersionUID = 1L;
+	
 	double [] measurements;
 	
 	public RobotAttribute(double [] measurements) {

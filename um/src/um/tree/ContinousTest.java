@@ -1,6 +1,6 @@
 package um.tree;
 
-import java.util.Vector;
+import java.io.Serializable;
 
 
 /**
@@ -8,10 +8,10 @@ import java.util.Vector;
  * @author piotrrr
  *
  */
-public class ContinousTest extends BinaryTest {
+public class ContinousTest extends BinaryTest implements Serializable {
 	
-	
-	
+	private static final long serialVersionUID = 1L;
+
 	public static ContinousTest chooseTest(ExamplesSet examples) {
 		AttributeList al = examples.examples.firstElement().attr; 
 		int attrCount = al.getNumberOfAttributes();
@@ -21,11 +21,12 @@ public class ContinousTest extends BinaryTest {
 		
 		for (int i=0; i<attrCount; i++) {
 			double [] avs = examples.getAscSortedAttributes(i);
+			if (avs.length <= 1) continue; //if there is no good test, it will be null
 			for (int j=1; j<avs.length; j++) 
 				avs[j-1] += (avs[j]-avs[j-1]) / 2;
 			for (double d : avs) {
 				ContinousTest t = new ContinousTest(d, i);
-				double entr = examples.getSetEnthropyWithSpecifiedTest(t);
+				double entr = examples.getSetEntropyWithSpecifiedTest(t);
 				if (entr < minEnthropy) {
 					bestTest = t;
 					minEnthropy = entr;

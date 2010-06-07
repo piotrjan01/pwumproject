@@ -19,22 +19,29 @@ public class TreeTools {
 	 * @return
 	 */
 	public static Node buildTheTree(ExamplesSet es, Node parent) {
-		Node tree = new Node(parent);
+		Node newNode = new Node(parent);
 		if (es.isMajorityOfOneCategory(stopCriteriumTolerance)) {
-			tree.setCategory(es.getMostFrequentCategory());
-			return tree;
+			newNode.setCategory(es.getMostFrequentCategory());
+			return newNode;
+		}
+		
+		ContinousTest test = ContinousTest.chooseTest(es);
+		//if we can't choose a good test, we mark it as a leaf
+		if (test == null) {
+			newNode.setCategory(es.getMostFrequentCategory());
+			return newNode;
 		}
 		
 		//It's a test node
-		tree.setTest(ContinousTest.chooseTest(es));
+		newNode.setTest(test);
 		
-		ExamplesSet sTrue = es.getExamplesSubsetForSpecifiedTestAndResult(tree.getTest(), true);
-		tree.addChild(true, buildTheTree(sTrue, tree));
+		ExamplesSet sTrue = es.getExamplesSubsetForSpecifiedTestAndResult(test, true);
+		newNode.addChild(true, buildTheTree(sTrue, newNode));
 		
-		ExamplesSet sFalse = es.getExamplesSubsetForSpecifiedTestAndResult(tree.getTest(), false);
-		tree.addChild(false, buildTheTree(sFalse, tree));
+		ExamplesSet sFalse = es.getExamplesSubsetForSpecifiedTestAndResult(test, false);
+		newNode.addChild(false, buildTheTree(sFalse, newNode));
 
-		return tree;
+		return newNode;
 	}
 	
 	public static void trimTree(Node root, ExamplesSet ts) {

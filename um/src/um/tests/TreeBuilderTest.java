@@ -63,9 +63,8 @@ public class TreeBuilderTest {
 		
 		Node tree = TreeTools.buildTheTree(es, null);
 		
-		for (Example e : ex) {
-			assertTrue(e.getCat().equals(tree.classify(e.getAttr())));
-		}
+		double error = tree.getClassificationError(es);
+        assertEquals(0.0, error, 0.0001);
 		
 	}
 	
@@ -84,9 +83,27 @@ public class TreeBuilderTest {
         s.addExample(new Example(new RobotAttribute(new double [] {4, 1}), c2));
         s.addExample(new Example(new RobotAttribute(new double [] {4, 2}), c2));
         s.addExample(new Example(new RobotAttribute(new double [] {4, 3}), c3));
+        s.addExample(new Example(new RobotAttribute(new double [] {1, 2}), c1));
+        s.addExample(new Example(new RobotAttribute(new double [] {4, 4}), c1));
+        s.addExample(new Example(new RobotAttribute(new double [] {3, 2}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {2, 4}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {3, 2}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {2, 5}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {7, 6}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {2, 7}), c1));
+        s.addExample(new Example(new RobotAttribute(new double [] {5, 6}), c2));
+        s.addExample(new Example(new RobotAttribute(new double [] {9, 8}), c2));
         
         Node r = TreeTools.buildTheTree(s, null);
+        double error = r.getClassificationError(s);
+        assertEquals(0.05882352, error, 0.0001);
+		assertTrue(17 == r.getNodeCount());
+		
+        TreeTools.trimTree(r, s);
         
+        error = r.getClassificationError(s);
+        assertEquals(0.05882352, error, 0.0001);
+        assertTrue(15 == r.getNodeCount());
         
 	}
 	

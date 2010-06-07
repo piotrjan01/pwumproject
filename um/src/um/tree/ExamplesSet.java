@@ -1,11 +1,18 @@
 package um.tree;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-public class ExamplesSet {
+public class ExamplesSet implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	Vector<Example> examples;
 	
 	/**
@@ -23,19 +30,7 @@ public class ExamplesSet {
 	 * @param e example
 	 */
 	public void addExample(Example e) {
-//		Category c1 = e.cat;
-//		Integer in = categoryCount.get(c1);
-//		boolean is = categoryCount.keySet().contains(c1);
-//		String cn = c1.getClass().getName();
-//		int h1 = c1.hashCode();
-//		int h2 = 0;
-//		for (Category c : categoryCount.keySet()) {
-//			if (c.equals(c1)) {
-//				is = true;
-//				h2 = c.hashCode();
-//			}
-//		}
-//		
+
 		if (categoryCount.containsKey(e.cat)) {
 			Integer i = categoryCount.get(e.cat);
 			i++;
@@ -125,7 +120,13 @@ public class ExamplesSet {
 		return ret;
 	}
 	
-	public double getSetEnthropyWithSpecifiedTestAndResult(ContinousTest test, boolean result) {
+	/**
+	 * Get entropy of the set part that respond to given test with a given result
+	 * @param test 
+	 * @param result
+	 * @return
+	 */
+	public double getSetEntropyWithSpecifiedTestAndResult(ContinousTest test, boolean result) {
 		double ret = 0;
 		for (Category cat : getAllCategories()) {
 			double ptrd = getExamplesCountWithSpecifiedCategoryTestAndResult(cat, test, result);
@@ -138,36 +139,28 @@ public class ExamplesSet {
 		return ret;
 	}
 	
-	public double getSetEnthropyWithSpecifiedTest(ContinousTest test) {
+	/**
+	 * Returns the entropy of categories of subsets that the given test creates
+	 * @param test
+	 * @return
+	 */
+	public double getSetEntropyWithSpecifiedTest(ContinousTest test) {
 		double countP = examples.size();
 		
 		double ptr1 = getExamplesCountWithSpecifiedTestAndResult(test, true);
-		double etr1 = getSetEnthropyWithSpecifiedTestAndResult(test, true); //NaN !!
+		double etr1 = getSetEntropyWithSpecifiedTestAndResult(test, true); //NaN !!
 		
 		double ptr2 = getExamplesCountWithSpecifiedTestAndResult(test, false);
-		double etr2 = getSetEnthropyWithSpecifiedTestAndResult(test, false); //NaN !!
+		double etr2 = getSetEntropyWithSpecifiedTestAndResult(test, false); //NaN !!
 		
 		return (ptr1*etr1/countP)+(ptr2*etr2/countP);
 	}
 	
-	public double getMinAttrVal(int attrIndex) {
-		double ret = Double.MAX_VALUE;
-		for (Example e : examples) {
-			if (e.attr.getAttributeValue(attrIndex) < ret)
-				ret = e.attr.getAttributeValue(attrIndex);
-		}
-		return ret;
-	}
-	
-	public double getMaxAttrVal(int attrIndex) {
-		double ret = Double.MIN_VALUE;
-		for (Example e : examples) {
-			if (e.attr.getAttributeValue(attrIndex) > ret)
-				ret = e.attr.getAttributeValue(attrIndex);
-		}
-		return ret;
-	}
-	
+	/**
+	 * Gets all the attribute values for the given attribute index sorted in ascending order
+	 * @param atrInd
+	 * @return
+	 */
 	public double [] getAscSortedAttributes(int atrInd) {
 		TreeSet<Double> s = new TreeSet<Double>();
 		for (Example e : examples) {
@@ -179,6 +172,12 @@ public class ExamplesSet {
 		return ret;
 	}
 	
+	/**
+	 * 
+	 * @param test
+	 * @param result
+	 * @return
+	 */
 	public ExamplesSet getExamplesSubsetForSpecifiedTestAndResult(ContinousTest test, boolean result) {
 		ExamplesSet ret = new ExamplesSet();
 		for (Example e : examples) {
@@ -192,6 +191,30 @@ public class ExamplesSet {
 		return examples;
 	}
 	
+	
+
+	public void saveToFile(String filename) {
+        try {
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static ExamplesSet readFromFile(String fileName) {
+    	ExamplesSet r = null;
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            r = (ExamplesSet)ois.readObject();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return r;
+    }
 	
 	
 

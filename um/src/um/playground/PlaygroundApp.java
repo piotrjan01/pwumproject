@@ -3,6 +3,7 @@ package um.playground;
 import simbad.gui.Simbad;
 import simbad.sim.EnvironmentDescription;
 import um.env.EnvFactory;
+import um.robots.DecisionTreeRobot;
 import um.robots.ReferenceRobot;
 import um.robots.TeacherRobot;
 
@@ -17,7 +18,8 @@ public class PlaygroundApp {
 		EnvFactory.wallHeight *= scale;
 		String map = "map3.png";
 		EnvironmentDescription ed = EnvFactory.readFromImageFile(map);
-		ed.add(new TeacherRobot(EnvFactory.getRobotStartPosFromImageFile(map), "Ref. robot", scale));
+//		ed.add(new TeacherRobot(EnvFactory.getRobotStartPosFromImageFile(map), "Ref. robot", scale, "test-examples.dat"));
+		ed.add(new DecisionTreeRobot(EnvFactory.getRobotStartPosFromImageFile(map), "DT robot", scale, "test-tree.tre"));
 		
 		new Simbad(ed, false);
 	}

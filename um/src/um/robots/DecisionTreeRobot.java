@@ -12,6 +12,7 @@ import simbad.sim.RangeSensorBelt;
 import um.common.Dbg;
 import um.tree.Example;
 import um.tree.ExamplesSet;
+import um.tree.Node;
 import um.tree.RobotAttribute;
 import um.tree.RobotCategory;
 
@@ -20,7 +21,7 @@ import um.tree.RobotCategory;
  * @author piotrrr
  *
  */
-public class TeacherRobot extends Agent {
+public class DecisionTreeRobot extends Agent {
 	
 	DecimalFormat format;
 	
@@ -32,14 +33,12 @@ public class TeacherRobot extends Agent {
 	
 	RobotOutput speed = new RobotOutput(100, 1, 200);
 	
-	ExamplesSet examples = null;
+	String treeFilename = null;
 	
-	String examplesFilename = null;
-	
-	enum Dir { FF, FL, FR, SL, SR};
+	Node dt = null;
 	
 	
-	public TeacherRobot(Vector3d pos, String name, float scale, String examplesFilename) {
+	public DecisionTreeRobot(Vector3d pos, String name, float scale, String treeFilename) {
 		super(pos, name);
 		this.scale = scale;
 		setColor(new Color3f(255, 255, 255));
@@ -57,9 +56,9 @@ public class TeacherRobot extends Agent {
         format.setPositivePrefix("+");
         format.setMinimumIntegerDigits(1);
 		
-        if (examplesFilename != null) {
-        	examples = new ExamplesSet();
-        	this.examplesFilename = examplesFilename;
+        if (treeFilename != null) {
+        	this.treeFilename = treeFilename;
+        	dt = Node.readFromFile(treeFilename);
         }
 	}
 	
@@ -120,91 +119,18 @@ public class TeacherRobot extends Agent {
             tr.transform(d);
             dir[arrayInd] = d;
 	}
-
-
-
-	
-	Dir getBestDirection() {
-		Dir ret = Dir.FF;
-		double maxDist;
-		
-		maxDist = Math.min(sonars.getMeasurement(0), sonars.getMeasurement(1));
-		
-		if (Math.min(sonars.getMeasurement(2), sonars.getMeasurement(3)) > maxDist) {
-			maxDist = Math.min(sonars.getMeasurement(2), sonars.getMeasurement(3));
-			ret = Dir.FL;
-		}
-		
-		if (Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5)) > maxDist) {
-			maxDist = Math.min(sonars.getMeasurement(4), sonars.getMeasurement(5));
-			ret = Dir.FR;
-		}
-		
-		if (Math.min(sonars.getMeasurement(6), sonars.getMeasurement(7)) > maxDist) {
-			maxDist = Math.min(sonars.getMeasurement(6), sonars.getMeasurement(7));
-			ret = Dir.SL;
-		}
-		
-		if (Math.min(sonars.getMeasurement(8), sonars.getMeasurement(9)) > maxDist) {
-			maxDist = Math.min(sonars.getMeasurement(8), sonars.getMeasurement(9));
-			ret = Dir.SR;
-		}
-		
-		return ret;
-	}
-	
-	
 	
 	@Override
 	protected void performBehavior() {
 		super.performBehavior();
 		
-		Dir dir = getBestDirection();
+		double [] measures = new double [sonars.getNumSensors()];
+		for (int i=0; i<measures.length; i++) measures[i]=sonars.getMeasurement(i);
+		RobotAttribute attr = new RobotAttribute(measures);
+		RobotCategory cat = (RobotCategory) dt.classify(attr);
 		
-		Dbg.prn("direction: "+dir);
-		
-		double sspeed = 0.1;
-		double mspeed = 0.5;
-		double medrotspeed = 1;
-		
-		switch (dir) {
-		case FF:
-			rot.setValuePercent(0);
-			speed.setValuePercent(1);
-			break;
-		case FL:
-			rot.setValuePercent(medrotspeed);
-			speed.setValuePercent(mspeed);
-			break;
-		case FR:
-			rot.setValuePercent(-medrotspeed);
-			speed.setValuePercent(mspeed);
-			break;
-		case SL:
-			rot.setValuePercent(1);
-			speed.setValuePercent(sspeed);
-			break;
-		case SR:
-			rot.setValuePercent(-1);
-			speed.setValuePercent(sspeed);
-			break;
-		}
-		
-		double realSpeed = speed.val*scale/3.6;
-		double realRot = Math.toRadians(rot.val);
-		
-		setTranslationalVelocity(realSpeed);
-		setRotationalVelocity(realRot);
-		
-		if (examplesFilename != null) {
-			double [] measures = new double [sonars.getNumSensors()];
-			for (int i=0; i<measures.length; i++) measures[i]=sonars.getMeasurement(i);
-			RobotAttribute attr = new RobotAttribute(measures);
-			RobotCategory cat = new RobotCategory(realSpeed, realRot);
-			examples.addExample(new Example(attr, cat));
-			//we save them every 50 frames
-			if (examples.getExamples().size() % 50 == 0) examples.saveToFile(examplesFilename);
-		}
+		setTranslationalVelocity(cat.getSpeed());
+		setRotationalVelocity(cat.getRot());
 		
 	}
 	

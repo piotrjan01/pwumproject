@@ -1,6 +1,8 @@
 package um.tree;
 
-public interface Category {
+import java.io.Serializable;
+
+public interface Category extends Serializable {
 
 	@Override
 	public boolean equals(Object obj);
